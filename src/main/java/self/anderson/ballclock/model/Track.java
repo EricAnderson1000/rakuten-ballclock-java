@@ -1,6 +1,7 @@
 package self.anderson.ballclock.model;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableList;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -39,6 +40,10 @@ public class Track {
     //Always spill in the reverse order
     Collections.reverse(result);
     return result;
+  }
+
+  public List<Ball> view() {
+    return ImmutableList.copyOf(balls);
   }
 
 }

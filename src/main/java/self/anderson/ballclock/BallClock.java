@@ -7,7 +7,10 @@ import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import self.anderson.ballclock.model.Ball;
+import self.anderson.ballclock.model.JsonView;
 import self.anderson.ballclock.model.Track;
+import self.anderson.ballclock.util.JsonHelper;
+import self.anderson.ballclock.util.NumberUtil;
 
 import java.util.*;
 
@@ -22,7 +25,8 @@ public class BallClock {
 
   private Queue<Ball> balls = new LinkedList<>();
 
-  public int start(int numberOfBalls) {
+
+  public int start(int numberOfBalls, Optional<Integer> haltAtMinute) {
 
     for (int i = 1; i <= numberOfBalls; i++) {
       balls.add(new Ball(i));
@@ -59,6 +63,12 @@ public class BallClock {
         balls.addAll(spillage);
         balls.add(ball);
       }
+
+      if (haltAtMinute.isPresent() && haltAtMinute.get() == minutes) {
+        JsonView jsonView = new JsonView(MINUTE_TRACK, FIVE_MINUTE_TRACK, HOUR_TRACK, balls);
+        System.out.println(new JsonHelper().toJson(jsonView));
+        return -1;
+      }
     }
 
     int days = Math.toIntExact(minutes / MINUTES_IN_DAY);
@@ -68,8 +78,8 @@ public class BallClock {
   /**
    * Valid numbers are in the range 27 to 127.
    */
-  private static List<Pair<Integer, Integer>>  getInput() {
-    List<Pair<Integer, Integer>> arguments = new ArrayList<>();
+  private static List<Pair<Integer, Optional<Integer>>>  getInput() {
+    List<Pair<Integer, Optional<Integer>>> arguments = new ArrayList<>();
     Scanner scanner = new Scanner(System. in);
 
 
@@ -80,14 +90,13 @@ public class BallClock {
       List<String> input = Lists.newArrayList(split);
       Preconditions.checkArgument(input.size() > 0 && input.size() < 3, "Invalid input [" + line + "]");
 
-      Integer a = Integer.parseInt(input.get(0));
-      Integer b = (input.size() == 2) ?
-          Integer.parseInt(input.get(1)) : null;
+      Optional<Integer> a = NumberUtil.parse(input.get(0));
+      Preconditions.checkArgument(a.isPresent(), "Invalid input : " + input.get(0));
+      Preconditions.checkArgument(a.get() > 26 && a.get() < 128, "Invalid input [" + a + "], Valid numbers are in the range 27 to 127 ");
 
-      Preconditions.checkArgument(a > 26 && a < 128, "Invalid input [" + a + "], Valid numbers are in the range 27 to 127 ");
-      Preconditions.checkArgument(b == null || (b > 26 && b < 128), "Invalid input [" + b + "], Valid numbers are in the range 27 to 127");
+      Optional<Integer> b = NumberUtil.parse(input.get(1));
 
-      arguments.add(Pair.of(a, b));
+      arguments.add(Pair.of(a.get(), b));
       line = scanner. nextLine();
     }
 
@@ -96,13 +105,14 @@ public class BallClock {
 
   public static void main(String[] args) {
 
-    List<Pair<Integer, Integer>> input = getInput();
-
+    List<Pair<Integer, Optional<Integer>>> input = getInput();
 
     input.forEach( pair -> {
       BallClock ballClock = new BallClock();
-      int result = ballClock.start(pair.getLeft());
-      System.out.println(pair.getLeft() + " balls cycle after " + result + " days.");
+      int result = ballClock.start(pair.getLeft(), pair.getRight());
+      if (result != -1) {
+        System.out.println(pair.getLeft() + " balls cycle after " + result + " days.");
+      }
     });
   }
 
