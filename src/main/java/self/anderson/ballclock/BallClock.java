@@ -20,9 +20,6 @@ public class BallClock {
   private final Track MINUTE_TRACK = new Track(5);
   private final Track FIVE_MINUTE_TRACK = new Track(12);
   private final Track HOUR_TRACK = new Track(12);
-
-  private static final long MINUTES_IN_DAY = 60 * 24;
-
   private Queue<Ball> balls = new LinkedList<>();
 
   /**
@@ -34,7 +31,7 @@ public class BallClock {
    * @return The number days to complete a cycle, or the time it takes for all balls to return to their original order.
    *          Unless the machine is halted early by the optional haltAtMinute param. In which it will return -1.
    */
-  public int start(int numberOfBalls, Optional<Integer> haltAtMinute) {
+  public ClockResult start(int numberOfBalls, Optional<Integer> haltAtMinute) {
 
     Preconditions.checkArgument(numberOfBalls > 26 && numberOfBalls < 128, "Number of balls must be between 27 and 127 inclusive");
 
@@ -75,14 +72,17 @@ public class BallClock {
       }
 
       if (haltAtMinute.isPresent() && haltAtMinute.get() == minutes) {
-        JsonView jsonView = new JsonView(MINUTE_TRACK, FIVE_MINUTE_TRACK, HOUR_TRACK, balls);
-        System.out.println(new JsonHelper().toJson(jsonView));
-        return -1;
+        break;
       }
     }
 
-    int days = Math.toIntExact(minutes / MINUTES_IN_DAY);
-    return days;
+    String representation = buildJson();
+    return new ClockResult(minutes, representation, numberOfBalls, haltAtMinute);
+  }
+
+  private String buildJson() {
+    JsonView jsonView = new JsonView(MINUTE_TRACK, FIVE_MINUTE_TRACK, HOUR_TRACK, balls);
+    return new JsonHelper().toJson(jsonView);
   }
 
   /**
@@ -121,11 +121,9 @@ public class BallClock {
 
     input.forEach( pair -> {
       BallClock ballClock = new BallClock();
-      int result = ballClock.start(pair.getLeft(), pair.getRight());
-      if (result != -1) {
-        System.out.println(pair.getLeft() + " balls cycle after " + result + " days.");
-      }
-    });
+      ClockResult result = ballClock.start(pair.getLeft(), pair.getRight());
+      System.out.println(result.printMessage());
+   });
   }
 
 }
