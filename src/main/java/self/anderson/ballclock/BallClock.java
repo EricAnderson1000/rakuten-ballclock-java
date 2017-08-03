@@ -94,7 +94,9 @@ public class BallClock {
       Preconditions.checkArgument(a.isPresent(), "Invalid input : " + input.get(0));
       Preconditions.checkArgument(a.get() > 26 && a.get() < 128, "Invalid input [" + a + "], Valid numbers are in the range 27 to 127 ");
 
-      Optional<Integer> b = NumberUtil.parse(input.get(1));
+      Optional<Integer> b = input.size() == 2 ?
+          NumberUtil.parse(input.get(1)) :
+          Optional.empty();
 
       arguments.add(Pair.of(a.get(), b));
       line = scanner. nextLine();
