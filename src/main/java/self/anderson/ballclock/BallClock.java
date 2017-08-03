@@ -22,7 +22,7 @@ public class BallClock {
 
   private Queue<Ball> balls = new LinkedList<>();
 
-  public void start(int numberOfBalls) {
+  public int start(int numberOfBalls) {
 
     for (int i = 1; i <= numberOfBalls; i++) {
       balls.add(new Ball(i));
@@ -30,12 +30,11 @@ public class BallClock {
 
     List<Ball> originalOrder = ImmutableList.copyOf(balls);
 
-    long minutes = 0l;
-    int halfDays = 0;
-    boolean starting = true;
+    //Prime
+    long minutes = 1l;
+    MINUTE_TRACK.addBall(balls.remove());
 
-    while (starting || !originalOrder.equals(balls)) {
-      starting = false;
+    while (!originalOrder.equals(balls)) {
       minutes++;
 
       MINUTE_TRACK.addBall(balls.remove());
@@ -59,25 +58,23 @@ public class BallClock {
         Ball ball = spillage.remove(0);
         balls.addAll(spillage);
         balls.add(ball);
-        halfDays++;
       }
     }
 
-
-
-    System.out.println("FOUND days : " + (minutes / MINUTES_IN_DAY) + " AND days : " + halfDays / 2);
+    int days = Math.toIntExact(minutes / MINUTES_IN_DAY);
+    return days;
   }
 
   /**
    * Valid numbers are in the range 27 to 127.
    */
-  private static List<Pair> getInput() {
-    List<Pair> arguments = new ArrayList<>();
+  private static List<Pair<Integer, Integer>>  getInput() {
+    List<Pair<Integer, Integer>> arguments = new ArrayList<>();
     Scanner scanner = new Scanner(System. in);
 
 
     String line = scanner. nextLine();
-    while (StringUtils.isNotEmpty(line) || !line.equals("0")) {
+    while (StringUtils.isNotEmpty(line)) {
 
       Iterable<String> split = Splitter.on(' ').split(line);
       List<String> input = Lists.newArrayList(split);
@@ -97,20 +94,16 @@ public class BallClock {
     return arguments;
   }
 
-
-
   public static void main(String[] args) {
 
-//    List<Pair> input = getInput();
-
-    BallClock ballClock = new BallClock();
-    ballClock.start(45);
-
-//    input.forEach(
-//        System.out::println
-//    );
+    List<Pair<Integer, Integer>> input = getInput();
 
 
+    input.forEach( pair -> {
+      BallClock ballClock = new BallClock();
+      int result = ballClock.start(pair.getLeft());
+      System.out.println(pair.getLeft() + " balls cycle after " + result + " days.");
+    });
   }
 
 }
