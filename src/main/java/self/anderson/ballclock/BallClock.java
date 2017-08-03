@@ -42,12 +42,16 @@ public class BallClock {
     List<Ball> originalOrder = ImmutableList.copyOf(balls);
 
     //Prime
-    long minutes = 1l;
-    MINUTE_TRACK.addBall(balls.remove());
+    long minutes = 0l;
 
-    while (!originalOrder.equals(balls)) {
+    while (minutes == 0 || !originalOrder.equals(balls)) {
+      //Terminate early
+      if (haltAtMinute.isPresent() && haltAtMinute.get() == minutes) {
+        break;
+      }
+
+      //Drop the ball
       minutes++;
-
       MINUTE_TRACK.addBall(balls.remove());
 
       if (MINUTE_TRACK.isFull()) {
@@ -69,10 +73,6 @@ public class BallClock {
         Ball ball = spillage.remove(0);
         balls.addAll(spillage);
         balls.add(ball);
-      }
-
-      if (haltAtMinute.isPresent() && haltAtMinute.get() == minutes) {
-        break;
       }
     }
 
