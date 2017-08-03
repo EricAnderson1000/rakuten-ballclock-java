@@ -25,8 +25,18 @@ public class BallClock {
 
   private Queue<Ball> balls = new LinkedList<>();
 
-
+  /**
+   *
+   * Starts the clock at 1:00 and starts moving balls. Once for each minute.
+   *
+   * @param numberOfBalls
+   * @param haltAtMinute
+   * @return The number days to complete a cycle, or the time it takes for all balls to return to their original order.
+   *          Unless the machine is halted early by the optional haltAtMinute param. In which it will return -1.
+   */
   public int start(int numberOfBalls, Optional<Integer> haltAtMinute) {
+
+    Preconditions.checkArgument(numberOfBalls > 26 && numberOfBalls < 128, "Number of balls must be between 27 and 127 inclusive");
 
     for (int i = 1; i <= numberOfBalls; i++) {
       balls.add(new Ball(i));
@@ -76,7 +86,7 @@ public class BallClock {
   }
 
   /**
-   * Valid numbers are in the range 27 to 127.
+   * Valid number balls are in the range 27 to 127.
    */
   private static List<Pair<Integer, Optional<Integer>>>  getInput() {
     List<Pair<Integer, Optional<Integer>>> arguments = new ArrayList<>();
