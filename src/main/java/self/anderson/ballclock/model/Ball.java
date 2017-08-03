@@ -1,17 +1,14 @@
 package self.anderson.ballclock.model;
 
-import java.util.UUID;
-
 public class Ball {
 
-    public Ball() {
-        uuid = UUID.randomUUID();
-    }
+  public Ball(int ballNumber) {
+    this.ballNumber = ballNumber;
+  }
 
-    UUID uuid;
+  int ballNumber;
 
-    public UUID getUuid() {
-        return uuid;
-    }
-
+  public int getBallNumber() {
+    return ballNumber;
+  }
 }

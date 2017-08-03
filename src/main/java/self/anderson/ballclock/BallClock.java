@@ -24,42 +24,49 @@ public class BallClock {
 
   public void start(int numberOfBalls) {
 
-    for (int i = 0; i < numberOfBalls; i++) {
-      balls.add(new Ball());
+    for (int i = 1; i <= numberOfBalls; i++) {
+      balls.add(new Ball(i));
     }
 
-    ImmutableList<Ball> startOrder = ImmutableList.copyOf(balls);
+    List<Ball> originalOrder = ImmutableList.copyOf(balls);
 
     long minutes = 0l;
+    int halfDays = 0;
+    boolean starting = true;
 
-
-    while (minutes == 0 || !startOrder.equals(Lists.newArrayList(balls))) {
+    while (starting || !originalOrder.equals(balls)) {
+      starting = false;
       minutes++;
 
       MINUTE_TRACK.addBall(balls.remove());
 
       if (MINUTE_TRACK.isFull()) {
         List<Ball> spillage = MINUTE_TRACK.spill();
-        FIVE_MINUTE_TRACK.addBall(spillage.remove(0));
+        Ball ball = spillage.remove(0);
+        FIVE_MINUTE_TRACK.addBall(ball);
         balls.addAll(spillage);
       }
 
       if (FIVE_MINUTE_TRACK.isFull()) {
         List<Ball> spillage = FIVE_MINUTE_TRACK.spill();
-        HOUR_TRACK.addBall(spillage.remove(0));
+        Ball ball = spillage.remove(0);
+        HOUR_TRACK.addBall(ball);
         balls.addAll(spillage);
       }
 
       if (HOUR_TRACK.isFull()) {
         List<Ball> spillage = HOUR_TRACK.spill();
+        Ball ball = spillage.remove(0);
         balls.addAll(spillage);
+        balls.add(ball);
+        halfDays++;
       }
-
     }
 
-    System.out.println("FOUND days : " + (minutes / MINUTES_IN_DAY) );
-  }
 
+
+    System.out.println("FOUND days : " + (minutes / MINUTES_IN_DAY) + " AND days : " + halfDays / 2);
+  }
 
   /**
    * Valid numbers are in the range 27 to 127.
@@ -70,7 +77,7 @@ public class BallClock {
 
 
     String line = scanner. nextLine();
-    while (StringUtils.isNotEmpty(line)) {
+    while (StringUtils.isNotEmpty(line) || !line.equals("0")) {
 
       Iterable<String> split = Splitter.on(' ').split(line);
       List<String> input = Lists.newArrayList(split);
@@ -97,7 +104,7 @@ public class BallClock {
 //    List<Pair> input = getInput();
 
     BallClock ballClock = new BallClock();
-    ballClock.start(30);
+    ballClock.start(45);
 
 //    input.forEach(
 //        System.out::println
